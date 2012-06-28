@@ -20,7 +20,8 @@ var gHexDumpDialog = {
                 var hexArr = morekomodo.hexDump.dumpFile(filePath, bytesPerRow);
 
                 var appendHexDumpToView = function(view) {
-                    view.document.baseName = 'Hex dump for "' + fileName + '"';
+                    var koDoc = view.document || view.koDoc;
+                    koDoc.baseName = 'Hex dump for "' + fileName + '"';
                     view.parentView.updateLeafName(view);
                     hexArr.push("") // add an empty line
                     var hexDump = hexArr.join('\n');

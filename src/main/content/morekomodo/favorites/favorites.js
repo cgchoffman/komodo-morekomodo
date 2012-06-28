@@ -95,9 +95,10 @@ var gFavorites = {
         }
     },
 
-    addCurrentFile : function() {
+    addCurrentFile : function() { debugger; 
         var mainWindow = ko.windowManager.getMainWindow();
-        var document = mainWindow.ko.views.manager.currentView.document;
+        var currView = mainWindow.ko.views.manager.currentView;
+        var document = (currView.document || currView.koDoc);
 
         if (document.isUntitled) {
             mainWindow.ko.dialogs.alert(this.bundle.getString("path.untitled.document"));
@@ -114,7 +115,8 @@ var gFavorites = {
 
     addCurrentFolder : function() {
         var mainWindow = ko.windowManager.getMainWindow();
-        var document = mainWindow.ko.views.manager.currentView.document;
+        var currView = mainWindow.ko.views.manager.currentView;
+        var document = (currView.document || currView.koDoc);
 
         if (document.isUntitled) {
             mainWindow.ko.dialogs.alert(this.bundle.getString("path.untitled.document"));
@@ -134,14 +136,26 @@ var gFavorites = {
 
     addAllFiles : function() {
         var views = ko.windowManager.getMainWindow().ko.views.manager.topView.getDocumentViews(true);
-
         var isDescByName = this.oDescription.checked;
-        for (var i = 0; i < views.length; i++) {
-            var document = views[i].document;
-            if (views[i].getAttribute("type") == "startpage" || document.isUntitled)
-                continue;
-            var favoriteInfo = FavoriteInfo.createInfo(null, isDescByName, document.file, false);
-            this.fileListTreeView.insertFavoriteInfo(favoriteInfo);
+        if ("document" in views){    
+            //CH
+            //This for loop was the original code
+            //Add the if around it and the else below it
+            for (var i = 0; i < views.length; i++) {
+                var document = views[i].document;
+                if (views[i].getAttribute("type") == "startpage" || document.isUntitled)
+                    continue;
+                var favoriteInfo = FavoriteInfo.createInfo(null, isDescByName, document.file, false);
+                this.fileListTreeView.insertFavoriteInfo(favoriteInfo);
+            }
+        }else{
+            for (var i = 0; i < views.length; i++) {
+                var document = views[i].koDoc;
+                if (views[i].getAttribute("type") == "startpage" || document.isUntitled)
+                    continue;
+                var favoriteInfo = FavoriteInfo.createInfo(null, isDescByName, document.file, false);
+                this.fileListTreeView.insertFavoriteInfo(favoriteInfo);
+            }
         }
         this.fileListTreeView.refresh();
     },

@@ -83,6 +83,7 @@
 <!ENTITY findresults.copy.selected.contents "Copy Selected Contents to View">
 <!ENTITY findresults.open.selected.files "Open Selected File(s)">
 
+
 <!ENTITY findresults.history.delete.tooltip "Delete Selected History Pattern(s)">
 <!ENTITY findresults.history.label "Find Results History">
 <!ENTITY findresults.history.file.label "File">

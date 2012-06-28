@@ -35,22 +35,31 @@
 # ***** END LICENSE BLOCK *****
 */
 var moreKomodoFindResultsHistory = {
+
     treeView : null,
 
     init : function() {
-        this.treeWidget = document.getElementById("morekomodo-findResultsHistory-tree");
+        //Debugger
+        debugger;
+
+        var pane = document.getElementById("morekomodo_findresults_history_tabpanel");
+        this.treeWidget = pane.contentDocument.getElementById("morekomodo-findResultsHistory-tree");
         this.treeView = new moreKomodoFindResultsHistoryTreeView(this.treeWidget);
-        this.disableButton = document.getElementById("morekomodo-findresults-history-disable");
+        this.disableButton = pane.contentDocument.getElementById("morekomodo-findresults-history-disable");
     },
 
     saveHistory : function(tabIndex, findOptions) {
+        //Debugger
+        debugger;
         if (this.isDisabled) {
+            //Debugger
+            debugger;
             return;
         }
         var results = [];
-        var findResultsTree = FindResultsTab_GetManager(tabIndex);
+        var findResultsTree = ko.findresults.getManager(tabIndex);
         var view = findResultsTree.view;
-        var columnId = {id : "findresults" + tabIndex + "-context"};
+        var columnId = {id : "findresults-context"};
 
         for (var i = 0; i < view.rowCount; i++) {
             results.push({
@@ -80,6 +89,8 @@ var moreKomodoFindResultsHistory = {
     },
 
     buildLabel : function(findInfo) {
+        //Debugger
+        debugger;
         var options = findInfo.options;
         var args = new Array(moreKomodoFindResultsUtil
                                 .createLabelFromFindInfo(findInfo));
@@ -123,6 +134,8 @@ var moreKomodoFindResultsHistory = {
     },
 
     onDblClick : function(event) {
+        //Debugger
+        debugger;
         var item = this.treeView.getSelectedItem();
         if (item && !item.isContainer) {
             this.jumpToFind(item.result);
@@ -131,23 +144,34 @@ var moreKomodoFindResultsHistory = {
     },
 
     deleteSelectedItems : function() {
+        //Debugger
+        debugger;
         this.treeView.deleteIndexes(this.treeView.selectedRootIndexes);
+        MoreKomodoCommon.log("This button appears to be broken.  This this.treeView.deleteIndexes = "+this.treeView.deleteIndexes+".  THis this.treeView.selectedRootIndexes = "+this.treeView.selectedRootIndexes);
     },
 
     get isDisabled() {
+        //Debugger
+        debugger;
         return this.disableButton.getAttribute("off") == "true";
     },
 
     toggleDisableHistory : function() {
+        //Debugger
+        debugger;
         if (this.disableButton.getAttribute("off") == "true") {
             this.disableButton.setAttribute("off", "false");
+            MoreKomodoCommon.log("The button is now enabled.");
         } else {
             this.disableButton.setAttribute("off", "true");
+            MoreKomodoCommon.log("The button should now be disabled.");
         }
     },
 
     // Adapted form FindResultsTabManager.prototype._doubleClick
     jumpToFind : function(result) {
+        //Debugger
+        debugger;
         // Jump to the find/replace result.
         try {
             //XXX Note that "url" is the current (bad) name for the view ID, which
@@ -159,8 +183,10 @@ var moreKomodoFindResultsHistory = {
                 function(view) {
                     var osPathSvc = Components.classes["@activestate.com/koOsPath;1"]
                             .getService(Components.interfaces.koIOsPath);
-                    if (!view || !view.document ||
-                        !osPathSvc.samepath(view.document.displayPath, displayPath))
+                            //CH
+                    var koDoc = view.document || view.koDoc;
+                    if (!view || !koDoc ||
+                        !osPathSvc.samepath(koDoc.displayPath, displayPath))
                     {
                         // File wasn't opened for whatever reason.
                         return;
@@ -274,6 +300,8 @@ function moreKomodoFindResultsHistoryTreeView(treeWidget) {
 
 moreKomodoFindResultsHistoryTreeView.prototype = {
     addItem : function(label, results) {
+        //Debugger
+        debugger;
         var historyItem = {
             label : label,
             isContainer : true,
@@ -286,6 +314,8 @@ moreKomodoFindResultsHistoryTreeView.prototype = {
     },
 
     invalidate : function() {
+        //Debugger
+        debugger;
         this.treebox.invalidate();
     },
 
@@ -306,6 +336,7 @@ moreKomodoFindResultsHistoryTreeView.prototype = {
     },
 
     get selectedRootIndexes() {
+        debugger;
         var selection = this.selection;
         var items = [];
 
@@ -326,6 +357,8 @@ moreKomodoFindResultsHistoryTreeView.prototype = {
     },
 
     deleteIndexes : function(indexes) {
+        //Debugger
+        debugger;
         if (indexes && indexes.length > 0) {
             for (var i = indexes.length - 1; i >= 0; i--) {
                 var index = indexes[i];
@@ -424,6 +457,8 @@ moreKomodoFindResultsHistoryTreeView.prototype = {
     },
 
     get rowCount() {
+        //Debugger
+        debugger;
         return this.visibleItems.length;
     },
 
@@ -466,4 +501,4 @@ moreKomodoFindResultsHistoryTreeView.prototype = {
         }
     }
 };
-
+window.addEventListener("load", function(event) { moreKomodoFindResultsHistory.init(event); }, false);

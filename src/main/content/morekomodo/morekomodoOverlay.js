@@ -117,15 +117,22 @@ var moreKomodo = {
                     var view = list[i];
                     if (view.getAttribute("type") == "editor") {
                         var caretPosition = getCaretPosition(view);
-                        view.document = commandInfo.newDocument;
+			//CH
+			if ("document" in view)
+			    view.document = commandInfo.newDocument;
+			else
+			    view.koDoc = commandInfo.newDocument;
 
                         moveCaret(view, caretPosition);
                         this.updateView(view);
 
                         // /opt/devel/mozilla/komodo/openkomodo/src/chrome/komodo/content/bindings/views-browser.xml
                         // /opt/devel/mozilla/komodo/openkomodo/src/chrome/komodo/content/bindings/views-editor.p.xml
+
                         if (view.preview) {
-                            view.preview.open(view.document.file.URI, false);
+			    //CH
+			    var koDoc = view.document || view.koDoc;
+                            view.preview.open(koDoc.file.URI, false);
                         }
                         // ensure colourise is applied
                         ko.commands.doCommand('cmd_viewAsGuessedLanguage');
@@ -194,10 +201,13 @@ var moreKomodo = {
 
         if (!ko.views.manager.batchMode
             && view
-            && view.getAttribute("type") == "editor"
-            && view.document) {
-            file = view.document.file;
-        }
+            && view.getAttribute("type") == "editor"){
+	    //CH
+		var koDoc = view.document || view.koDoc;
+		if (koDoc){
+		    file = koDoc.file;
+		}
+	    }
         this._updateFileTimeStatusbar(file);
     },
 
@@ -206,11 +216,24 @@ var moreKomodo = {
 
         var views = ko.views.manager.topView.findViewsForURI(uri);
         // Get cached file informations
-        if (views.length > 0 && views[0].document.file.isRemoteFile) {
-            fileEx = views[0].document.file;
-        } else {
-            fileEx = MoreKomodoCommon.makeIFileExFromURI(uri);
-        }
+	// CH
+	var view = views[0];
+	if (!view){
+	    return;
+	}
+	if ("document" in view){
+	    if (view.document.file.isRemoteFile) {
+		fileEx = view.document.file;
+	    } else {
+		fileEx = MoreKomodoCommon.makeIFileExFromURI(uri);
+	    }
+	} else{
+	    if (view.koDoc.file.isRemoteFile) {
+		fileEx = view.koDoc.file;
+	    } else {
+		fileEx = MoreKomodoCommon.makeIFileExFromURI(uri);
+	    }
+	}//CH
         this._updateFileTimeStatusbar(fileEx);
     },
 
@@ -249,11 +272,11 @@ var moreKomodo = {
 	    }
 	}
         return true;
-    },        
+    },
 
     onRenameFile : function() {
         var currView = ko.views.manager.currentView;
-        var viewDoc = currView.document;
+        var viewDoc = (currView.document || currView.koDoc);
 
         if (!this.checkDirtyFile(viewDoc)) {
             return;
@@ -301,15 +324,18 @@ var moreKomodo = {
     },
 
     onDeleteFile : function() {
+	//CH
         try {
             var view = ko.views.manager.currentView;
-            var file = view.document.file;
+	    var koDoc = view.document || view.koDoc;
+            var file = koDoc.file;
             var msg = MoreKomodoCommon.getLocalizedMessage("confirm.delete.file");
 
             if (ko.dialogs.yesNo(msg, "No", file.displayPath) == "Yes") {
                 MoreKomodoCommon.deleteFile(file.displayPath);
                 // the observer will close also calling view
-                var data = {document : view.document,
+		//CH
+                var data = {document : koDoc,
                             command : "delete"
                             };
                 data.wrappedJSObject = data;
@@ -323,9 +349,11 @@ var moreKomodo = {
     },
 
     onMakeBackup : function() {
+	//CH
         try {
             var view = ko.views.manager.currentView;
-            var file = view.document.file;
+	    var koDoc = view.document || view.koDoc;
+            var file = koDoc.file;
             var currentPath = MoreKomodoCommon.makeLocalFile(file.path);
             var msg = MoreKomodoCommon.getLocalizedMessage("select.backup.file.title");
             var fp = MoreKomodoCommon.makeFilePicker(window,
@@ -347,7 +375,12 @@ var moreKomodo = {
 
     onCopyFullPath : function() {
         var view = ko.views.manager.currentView;
-        var file = view.document.displayPath;
+	//CH
+	var document = view.document || view.koDoc;
+        //var file = view.document.displayPath || view.koDoc.displayPath;
+	// above line breaks, changed to match the onCopyDirectoryPath mothod
+	var file = document.displayPath;
+
 
         MoreKomodoCommon.copyToClipboard(file);
         view.setFocus();
@@ -355,7 +388,8 @@ var moreKomodo = {
 
     onCopyDirectoryPath : function() {
         var view = ko.views.manager.currentView;
-        var document = view.document;
+	//CH
+        var document = view.document || view.koDoc;
         var file = document.file;
         var dirName = file.dirName;
 
@@ -369,7 +403,9 @@ var moreKomodo = {
 
     onCopyFileName : function() {
         var view = ko.views.manager.currentView;
-        var file = view.document.baseName;
+	//CH
+	var document = view.document || view.koDoc;
+        var file = document.baseName;
 
         MoreKomodoCommon.copyToClipboard(file);
         view.setFocus();
@@ -561,21 +597,42 @@ var moreKomodo = {
             case "cmd_morekomodo_copyFullPath":
             case "cmd_morekomodo_copyFileName":
             case "cmd_morekomodo_copyDirectoryPath":
-                if (view && view.document) {
-                    return !(view.document.isUntitled
-                            || view.getAttribute("type") != "editor");
-                }
+		//CH
+		if (view){
+		    var koDoc = view.document || view.koDoc;
+		    if (koDoc){
+			return !(koDoc.isUntitled
+				 ||view.getAttribute("type") !="editor");
+		    }
+		}
+		//first try
+		//if ("document" in view){
+		//    if (view && view.document) {
+		//	return !(view.document.isUntitled
+		//		|| view.getAttribute("type") != "editor");
+		//    }
+		//}else{
+		//    if (view && view.koDoc) {
+		//	return !(view.koDoc.isUntitled
+		//		|| view.getAttribute("type") != "editor");
+		//    }
+		//}//CH
                 return false;
             case "cmd_morekomodo_move":
             case "cmd_morekomodo_showInFileManager":
             case "cmd_morekomodo_makeBackup":
                 // These commands aren't supported on remote
-                if (view && view.document) {
-                    return !(view.document.isUntitled
-                            || view.getAttribute("type") != "editor"
-                            || view.document.file.isRemoteFile);
-                }
-                return false;
+		//CH
+		if (view) {
+		    var koDoc = view.document || view.koDoc;
+		    if(koDoc){
+			return !(koDoc.isUntitled
+				|| view.getAttribute("type") != "editor"
+				|| koDoc.file.isRemoteFile);
+		    }
+		}	//CH
+
+		return false;
             case "cmd_morekomodo_pastehtml":
                 return MoreKomodoCommon.hasClipboardHtml();
             case "cmd_morekomodo_copyappend":
@@ -583,12 +640,16 @@ var moreKomodo = {
             case "cmd_morekomodo_cutappend":
                 return view && view.getAttribute('type') == 'editor';
             case "cmd_morekomodo_sort":
-                if (view && view.document) {
-                    return view.getAttribute("type") == "editor";
+                if (view) {
+		    var koDoc = view.document || view.koDoc;
+		    if (koDoc){
+			return view.getAttribute("type") == "editor";
+		    }
                 }
                 return false;
             case "cmd_morekomodo_lockedit":
-                return view && view.getAttribute('type') == 'editor' && view.document;
+		var koDoc = view.document || view.koDoc;
+                return view && view.getAttribute('type') == 'editor' && koDoc;
             case "cmd_morekomodo_unicodetable":
             case "cmd_morekomodo_hexdump":
                 return true;
@@ -689,7 +750,7 @@ var moreKomodo = {
             return;
         } else if (this._koPrefs.getBooleanPref('editSmartCutCopyWithoutSelection')) {
             var curr = "";
-            
+
             // save current clipboard content before the cut
             if (MoreKomodoCommon.hasDataMatchingFlavors(["text/unicode"])) {
                 curr = MoreKomodoCommon.pasteFromClipboard();
@@ -707,7 +768,8 @@ var moreKomodo = {
 
     onShowInFileManager : function() {
         var view = ko.views.manager.currentView;
-        var path = view.document.file.path;
+	var koDoc = view.document || view.koDoc;
+        var path = koDoc.file.path;
 
         Components.classes["@activestate.com/koSysUtils;1"]
             .getService(Components.interfaces.koISysUtils)
@@ -761,18 +823,34 @@ var moreKomodo = {
     _updateLockEdit : function(view) {
         var button = document.getElementById("cmd_morekomodo_lockedit");
 
-        if (view
-            && view.getAttribute('type') == 'editor'
-            && view.document) {
-            if (view.scintilla.scimoz.readOnly) {
-                button.setAttribute("checked", "true");
-            } else {
-                button.removeAttribute("checked");
-            }
-        } else {
-            // Disabled button always shown as unlocked
-            button.removeAttribute("checked");
-        }
+    //    if (view
+    //        && view.getAttribute('type') == 'editor'
+    //        && view.document) {
+    //        if (view.scintilla.scimoz.readOnly) {
+    //            button.setAttribute("checked", "true");
+    //        } else {
+    //            button.removeAttribute("checked");
+    //        }
+    //    } else {
+    //        // Disabled button always shown as unlocked
+    //        button.removeAttribute("checked");
+    //    }
+    //},
+	var koDoc = view.document || view.koDoc;
+	if (view
+	    && view.getAttribute('type') == 'editor'
+	    //attempting declaration of variable within if statement
+	    //ref: http://code.activestate.com/lists/komodo-beta/4456/
+	    && koDoc) {
+	    if (view.scintilla.scimoz.readOnly) {
+		button.setAttribute("checked", "true");
+	    } else {
+		button.removeAttribute("checked");
+	    }
+	    } else {
+	    // Disabled button always shown as unlocked
+	    button.removeAttribute("checked");
+	}
     },
 
     onToogleLockEdit : function(view) {
@@ -780,7 +858,8 @@ var moreKomodo = {
             view = ko.views.manager.currentView;
         }
         if (view && view.getAttribute('type') == 'editor') {
-            var data = {document : view.document,
+            var  koDoc = view.document || view.koDoc;
+	    var data = {document : koDoc,
                         readOnly : !view.scintilla.scimoz.readOnly,
                         command : "lock"
                         };

@@ -57,7 +57,8 @@ var moreKomodoFindResultsUtil = {
             };
 
             var updateFindResultView = function(view) {
-                view.document.baseName = findViewName;
+                var koDoc = view.document || view.koDoc;
+               koDoc.baseName = findViewName;
                 view.parentView.updateLeafName(view);
                 copyFunc(view);
             };

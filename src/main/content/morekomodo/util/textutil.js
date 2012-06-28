@@ -285,10 +285,15 @@ function sortView(view, sortOptions) {
 
         lines.push(scimoz.getTextRange(startPos, endPos));
     }
-
-    var s = getSortedBuffer(lines, sortOptions,
-                            eolText[view.document.new_line_endings]);
-
+    
+    //CH
+    if ("document" in view){
+        var s = getSortedBuffer(lines, sortOptions,
+                                eolText[view.document.new_line_endings]);
+    }else{
+         var s = getSortedBuffer(lines, sortOptions,
+                                eolText[view.koDoc.new_line_endings]);
+    }
     if (useSelection) {
         scimoz.selectionStart = scimoz.positionFromLine(firstLine);
         scimoz.selectionEnd = scimoz.getLineEndPosition(lastLine);
@@ -387,7 +392,9 @@ function moveCaret(view, caretPosition) {
 function getSelection(view) {
     var sel = view.selection;
     var selArr = [];
-
+    //CH
+    //See other CH tag below at line 416
+    var koDoc = view.document || view.koDoc;
     if (sel.length) {
         var scimoz = view.scintilla.scimoz;
         var selectionMode = scimoz.selectionMode;
@@ -406,7 +413,8 @@ function getSelection(view) {
             selArr.push(scimoz.getTextRange(selectionStart, selectionEnd));
         }
     }
-    return selArr.join(eolText[view.document.new_line_endings]);
+    //CH
+    return selArr.join(eolText[koDoc.new_line_endings]);
 }
 
 /**
@@ -452,7 +460,9 @@ function getCurrentLine(view) {
     if (scimoz.getLineEndPosition(lineStart) == nextLineStartPos) {
         // At last line of doc, buffer doesn't end with an EOL
         var line = scimoz.getTextRange(lineStartPos, nextLineStartPos);
-        var eol = eolText[view.document.new_line_endings];
+        //CH
+        var koDoc = view.document || view.koDoc;
+        var eol = eolText[koDoc.new_line_endings];
         return line + eol;
     } else {
         return scimoz.getTextRange(lineStartPos, nextLineStartPos);

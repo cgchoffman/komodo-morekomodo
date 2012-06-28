@@ -36,8 +36,8 @@
 */
 var findInFilesWidgetsInitializer = {
     findContextMap : {
-        "curr-project" : document.getElementById("search-in-curr-project"),
-        "files" : document.getElementById("search-in-files")
+        "curr-project" : document.getElementById("menu_findInCurrProject"),
+        "files" : document.getElementById("menu_findInFiles")
             || document.getElementsByAttribute("value", "files").item(0),
         "collection" : document.getElementById("search-in-collection")},
 
@@ -60,6 +60,7 @@ var findInFilesWidgetsInitializer = {
     },
 
     setLastFindInFiles : function() {
+        //how do the tow things in the line below relate to each other?
         if ((this.searchIn.value in this.findContextMap)
             && this.prefs.useLastFindContext) {
             var lastFindContext = this.prefs.lastFindContext;

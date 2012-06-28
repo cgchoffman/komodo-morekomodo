@@ -36,6 +36,8 @@
 */
 var moreKomodoRunOutputResults = {
     onLoad : function() {
+        //CH  Added pane to accomodate separation in document to contentDocument
+
         var listButtonWidget = document.getElementById("runoutput-list-button");
 
         this.enableCopyButton(!listButtonWidget.hasAttribute("disabled"));
@@ -49,14 +51,15 @@ var moreKomodoRunOutputResults = {
             listButtonWidget.addEventListener("DOMAttrModified",
                         this.handle_copy_setup,
                         false);
-        }
+            }
 
         // Allow to select items to copy
+        //CH  Added pane to accomodate separation in document to contentDocument
         var treeWidget = document.getElementById("runoutput-tree");
         if (treeWidget) {
             treeWidget.setAttribute("context", "moreKomodoRunOutputResultsContext");
         }
-
+        
         window.controllers.appendController(this);
      },
 

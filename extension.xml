@@ -1,78 +1,67 @@
-<!DOCTYPE extension [
-<!ENTITY extension.version "1.8.2">
-]>
-
 <extension name="morekomodo">
     <title-name>MoreKomodo</title-name>
     <uuid>morekomodo@dafizilla.sourceforge.net</uuid>
-    <version>&extension.version;</version>
+    <version>1.8.3</version>
     <description>Add new features to Komodo. Favorites, file and clipboard operation, text conversion</description>
     <homepage>http://dafizilla.sourceforge.net/morekomodo</homepage>
     <updateurl>http://dafizilla.sourceforge.net/morekomodo/update.php?item_id=%ITEM_ID%&amp;item_version=%ITEM_VERSION%&amp;app_id=%APP_ID%&amp;app_version=%APP_VERSION%</updateurl>
     <iconurl-path>skin/appicon.png</iconurl-path>
-    <optionurl-path/>
+    <optionurl-path />
     <author>Davide Ficano</author>
     <ohloh-project-name>morekomodo</ohloh-project-name>
-    
-    <!-- Do not add to install.rdf deprecated infos about content, skin and locales (i.e. contents.rdf) -->
+    <!--Do not add to install.rdf deprecated infos about content, skin and locales (i.e. contents.rdf)-->
     <use-only-chrome-manifest>true</use-only-chrome-manifest>
-
-    <!-- Point to directory containing content, locales and skins. -->
+    <!--Point to directory containing content, locales and skins.-->
     <!-- If present must start with / (slash) -->
     <chrome-extension-directory>/morekomodo</chrome-extension-directory>
-
     <!-- Used by web site update.rdf -->
-    <updateLink>http://dafizilla.sourceforge.net/morekomodo/morekomodo-&extension.version;.xpi</updateLink>
-
+    <updateLink>http://dafizilla.sourceforge.net/morekomodo/morekomodo-1.8.3.xpi</updateLink>
     <!-- used by install.js -->
     <skins>
         <skin>classic</skin>
     </skins>
-    
-    <!-- used by install.js and build process to set the prefs.js.xsl destination file name -->
+    <!--used by install.js and build process to set the prefs.js.xsl destination file name-->
     <prefs>
         <pref>morekomodo.js</pref>
     </prefs>
-
     <locales>
         <locale pos="1" code="en-US" />
-        <!--<locale pos="2" code="it-IT" />-->
+        <!-- <locale pos="2" code="it-IT" /> -->
     </locales>
-
-    <styles>
-    </styles>
-
+    <styles></styles>
     <overlays>
         <overlay description="Editor" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/morekomodoOverlay.xul" />
         <overlay description="Preferences" uri="chrome://komodo/content/pref/pref.xul" value="chrome://morekomodo/content/pref/prefOverlay.xul" />
-        <overlay description="Filebrowser" uri="chrome://komodo/content/dialogs/filebrowser/filebrowser.xul"
-                    value="chrome://morekomodo/content/favorites/filebrowser/filebrowserOverlay.xul" />
-        <overlay description="FindResults-ko5" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/findResults/findResultsOverlay-ko5.xul" />
-        <overlay description="Find Dialog" uri="chrome://komodo/content/find/find2.xul" value="chrome://morekomodo/content/favorites/find/findOverlay.xul" />
-        <overlay description="Run Output Results" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/runOutputResults/runOutputResultsOverlay.xul" />
-        <overlay description="CodeConversion-ko5" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/codeConversionOverlay-ko5.xul appversion&lt;6b1" />
-        <overlay description="CodeConversion-ko6" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/codeConversionOverlay-ko6.xul appversion&gt;6b1" />
-    </overlays>
+        <overlay description="Filebrowser" uri="chrome://komodo/content/dialogs/filebrowser/filebrowser.xul" value="chrome://morekomodo/content/favorites/filebrowser/filebrowserOverlay.xul" />
+        <overlay description="FindResults-ko6" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/findResults/findResultsOverlay-ko6.xul appversion&lt;7b1" />
+        <overlay description="FindResults-ko7" uri="chrome://komodo/content/find/findResultsTab.xul" value="chrome://morekomodo/content/findResults/findResultsOverlay-ko7.xul appversion&gt;7b1" />
+        <overlay description="FindResults-ko7" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/findResults/findResultsHistoryOverlay.xul appversion&gt;7b1" />
 
+        <overlay description="Find Dialog" uri="chrome://komodo/content/find/find2.xul" value="chrome://morekomodo/content/favorites/find/findOverlay.xul" />
+        <!-- Run output overlay ko6 -->
+        <overlay description="Run Output Results" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/runOutputResults/runOutputResultsOverlay.xul appversion&lt;7b1" />
+        <!-- End Run output overlay version compatibility ko6 -->
+        <!-- Run output overlay with new panes accommodated ko7 -->
+        <overlay description="Run Output Results" uri="chrome://komodo/content/run/runOutputPane.xul" value="chrome://morekomodo/content/runOutputResults/runOutputResultsOverlay-main.xul appversion&gt;7b1" />
+        <overlay description="Run Output Results" uri="chrome://komodo/content/run/runOutputPane.xul" value="chrome://morekomodo/content/runOutputResults/runOutputResultsOverlay-content.xul appversion&gt;7b1" />
+        <!-- End Run output overlay version compatibility ko7 -->
+        <overlay description="CodeConversion-ko6" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/codeConversionOverlay-ko6.xul appversion&lt;7b1" />
+        <overlay description="CodeConversion-ko7" uri="chrome://komodo/content/komodo.xul" value="chrome://morekomodo/content/codeConversionOverlay-ko7.xul appversion&gt;7b1" />
+    </overlays>
     <compatibility>
         <application>
             <description>Komodo IDE</description>
             <id>{36E66FA0-F259-11D9-850E-000D935D3368}</id>
-            <minVersion>5.0</minVersion>
-            <maxVersion>6.*</maxVersion>
+            <minVersion>6.0</minVersion>
+            <maxVersion>7.*</maxVersion>
         </application>
-        
         <application>
             <description>Komodo Edit</description>
             <id>{b1042fb5-9e9c-11db-b107-000d935d3368}</id>
-            <minVersion>5.0</minVersion>
-            <maxVersion>6.*</maxVersion>
+            <minVersion>6.0</minVersion>
+            <maxVersion>7.*</maxVersion>
         </application>
     </compatibility>
-
-    <contributors>
-    </contributors>
-
-    <translators>
-    </translators>
+    <contributors></contributors>
+    <translators></translators>
 </extension>
